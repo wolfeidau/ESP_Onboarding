@@ -1,0 +1,14 @@
+#######################################
+# Syntax Coloring Map For ESPlant_Onboarding
+#######################################
+# Class
+#######################################
+
+ESP_Onboarding  KEYWORD1
+
+#######################################
+# Methods and Functions
+#######################################
+
+handleClient    KEYWORD2
+begin           KEYWORD2
