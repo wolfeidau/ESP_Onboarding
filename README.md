@@ -20,7 +20,7 @@ esptool.py --port /dev/tty.usbserial-A60409VU erase_flash
 
 * Connect your laptop to the AP of the ESP device
 
-* Use curl to configure the wifi credentials for your network replacing xxxx with the value of the access token, and configuring the ssid and password for your network.
+* Use curl to configure the Wifi credentials for your network replacing xxxx with the value of the Access Token, and configuring the ssid and password for your network.
 
 ```
 curl -v -H "Authorization: Token xxxx" 'http://192.168.4.1:8000/wifiSetup?ssid=xxx&pass=xxx'

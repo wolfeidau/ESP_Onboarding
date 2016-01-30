@@ -30,12 +30,11 @@ ESP_Onboarding.cpp - Onboarding library for the ESP8266
 class ESP_Onboarding
 {
   public:
-    ESP_Onboarding(IPAddress addr, int port = 8000);
-    ESP_Onboarding(int port = 8000);
+    ESP_Onboarding(ESP8266WebServer * server);
     ~ESP_Onboarding();
     void handleClient();
     void begin();
-    void startServer();
+    void startServer(bool configured);
     String getSSID();
     String getPassword();
     String getToken();
@@ -44,11 +43,12 @@ class ESP_Onboarding
     bool _saveWifiCreds();
     void _initToken();
     void _wifiSetup();
+    void _wifiReset();
     bool _authenticate();
     String _ssid;
     String _pass;
     String _token;
-    ESP8266WebServer  _server;
+    ESP8266WebServer * _server;
 };
 
 #endif //ESP_Onboarding_h

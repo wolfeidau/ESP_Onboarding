@@ -30,20 +30,14 @@ ESP_Onboarding.h - Onboarding library for the ESP8266
 
 #define DEBUG_OUTPUT Serial
 
-const char * AUTHORIZATION_HEADER = "Authorization";
+const char * AUTH_HEADER = "Authorization";
 
-ESP_Onboarding::ESP_Onboarding(IPAddress addr, int port)
-: _server(addr, port)
-{
-}
-
-ESP_Onboarding::ESP_Onboarding(int port)
-: _server(port)
-{
+ESP_Onboarding::ESP_Onboarding(ESP8266WebServer * server) {
+  _server = server;
 }
 
 void ESP_Onboarding::handleClient() {
-  _server.handleClient();
+  _server->handleClient();
 }
 
 void ESP_Onboarding::begin() {
@@ -57,30 +51,35 @@ void ESP_Onboarding::begin() {
 
   }
 
-//   if (!SPIFFS.format()) {
-
-// #ifdef DEBUG
-//     DEBUG_OUTPUT.println("Failed to format file system");
-// #endif
-
-//   }
-
   _initToken();
 
 }
 
-void ESP_Onboarding::startServer() {
+void ESP_Onboarding::startServer(bool configured) {
 
-  _server.on("/wifiSetup", [this]() {
-    _wifiSetup();
-  });
+  DEBUG_OUTPUT.print("Wifi is configured ");
+  DEBUG_OUTPUT.println(configured);
+
+  if (configured) {
+    DEBUG_OUTPUT.println("binding wifiReset");
+
+    _server->on("/wifiReset", [this]() {
+      _wifiReset();
+    });
+  } else {
+    DEBUG_OUTPUT.println("binding wifiSetup");
+
+    _server->on("/wifiSetup", [this]() {
+      _wifiSetup();
+    });
+  }
 
   //ask server to track these headers which we need for authentication
   const char * headerkeys[] = {"Authorization"} ;
   size_t headerkeyssize = sizeof(headerkeys)/sizeof(char*);
-  _server.collectHeaders(headerkeys, headerkeyssize);
+  _server->collectHeaders(headerkeys, headerkeyssize);
 
-  _server.begin();
+  _server->begin();
 
 }
 
@@ -178,7 +177,14 @@ void ESP_Onboarding::_initToken() {
     return;
   }
 
-  _token = "yiphtOobtoifIrt6";
+  char buf[16];
+
+  uint32_t really_rand_one = *(volatile uint32_t *)0x3FF20E44;
+  uint32_t really_rand_two = *(volatile uint32_t *)0x3FF20E44;
+
+  sprintf(buf, "%x%x", really_rand_one, really_rand_two);
+
+  _token = String(buf);
 
   tokenFile = SPIFFS.open("/token.txt", "w");
   if (!tokenFile) {
@@ -188,26 +194,54 @@ void ESP_Onboarding::_initToken() {
     return;
   }
 
+#ifdef DEBUG
   DEBUG_OUTPUT.print("saving token: ");
   DEBUG_OUTPUT.println(_token);
+#endif
 
   tokenFile.print(_token);
 }
 
-
-void ESP_Onboarding::_wifiSetup() {
-
-  DEBUG_OUTPUT.print("Header Count: ");
-  DEBUG_OUTPUT.println(_server.headers());
+void ESP_Onboarding::_wifiReset() {
 
   if (!_authenticate()){
-    _server.send(401, "text/plain", "Unauthorised");
+    _server->send(401, "text/plain", "Unauthorised");
     return;
   }
 
-  if(_server.hasArg("ssid") && (_server.hasArg("pass"))) {
-    _ssid = _server.arg("ssid");
-    _pass = _server.arg("pass");
+  // filesystem setup
+  if (!SPIFFS.begin()) {
+
+#ifdef DEBUG
+    DEBUG_OUTPUT.println("Failed to mount file system");
+#endif
+
+  }
+
+  // format the flash
+  if (!SPIFFS.format()) {
+
+#ifdef DEBUG
+    DEBUG_OUTPUT.println("Failed to format file system");
+#endif
+
+  }
+
+  // reboot
+  ESP.restart();
+
+}
+
+void ESP_Onboarding::_wifiSetup() {
+
+  if (!_authenticate()){
+    _server->send(401, "text/plain", "Unauthorised");
+    return;
+  }
+
+  if(_server->hasArg("ssid") && (_server->hasArg("pass"))) {
+    _ssid = _server->arg("ssid");
+    _pass = _server->arg("pass");
 
 #ifdef DEBUG
     DEBUG_OUTPUT.print("configuring ssid: ");
@@ -215,9 +249,9 @@ void ESP_Onboarding::_wifiSetup() {
 #endif
 
     if (!_saveWifiCreds()) {
-    _server.send(500, "text/plain", "Save configuration failed");
+    _server->send(500, "text/plain", "Save configuration failed");
     }
-    _server.send(200, "text/plain", "OK");
+    _server->send(200, "text/plain", "OK");
 
     // reboot
     ESP.restart();
@@ -225,13 +259,13 @@ void ESP_Onboarding::_wifiSetup() {
     return;
   }
 
-  _server.send(400, "text/plain", "");
+  _server->send(400, "text/plain", "");
 }
 
 bool ESP_Onboarding::_authenticate(){
 
-  if(_server.hasHeader(AUTHORIZATION_HEADER)) {
-    String authReq = _server.header(AUTHORIZATION_HEADER);
+  if(_server->hasHeader(AUTH_HEADER)) {
+    String authReq = _server->header(AUTH_HEADER);
 
 #ifdef DEBUG
     DEBUG_OUTPUT.print("authReq: ");
