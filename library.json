@@ -1,0 +1,13 @@
+{
+  "name": "ESP_Onboarding",
+  "keywords": "wifi, wi-fi, onboarding",
+  "description": "ESP8266 onboarding library",
+  "repository":
+  {
+    "type": "git",
+    "url": "https://github.com/wolfeidau/ESP_Onboarding.git"
+  },
+  "frameworks": "arduino",
+  "platforms": "espressif",
+  "version": "1.0"
+}
