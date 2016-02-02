@@ -5,7 +5,10 @@
 #include <ArduinoJson.h>
 #include <FS.h>
 
-ESP_Onboarding server;
+// Listen on :9000
+ESP8266WebServer webserver(9000);
+
+ESP_Onboarding server(&webserver);
 
 void setup() {
 
@@ -14,8 +17,13 @@ void setup() {
 
   server.begin();
 
+  bool configured = server.loadWifiCreds();
+
+  Serial.println("Loading onboarding server");
+  server.startServer(configured);
+
   // do we have config
-  if (server.loadWifiCreds()) {
+  if (configured) {
     String ssid = server.getSSID();
     String pass = server.getPassword();
 
@@ -43,8 +51,6 @@ void setup() {
   Serial.print("Access Token: ");
   Serial.println(server.getToken());
 
-  Serial.println("Loading onboarding server");
-  server.startServer();
 }
 
 void loop() {
