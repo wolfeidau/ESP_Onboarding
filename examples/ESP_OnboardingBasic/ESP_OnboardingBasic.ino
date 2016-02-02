@@ -5,6 +5,9 @@
 #include <ArduinoJson.h>
 #include <FS.h>
 
+// enable debugging for the onboarding library
+#define ESPO_DEBUG
+
 // Listen on :9000
 ESP8266WebServer webserver(9000);
 

@@ -91,7 +91,7 @@ bool ESP_Onboarding::loadWifiCreds() {
 
   if (!configFile) {
 
-#ifdef DEBUG
+#ifdef ESPO_DEBUG
     DEBUG_OUTPUT.println("Failed to open config file");
 #endif
 
@@ -151,7 +151,7 @@ bool ESP_Onboarding::_saveWifiCreds() {
   File configFile = SPIFFS.open("/config.json", "w");
   if (!configFile) {
 
-#ifdef DEBUG
+#ifdef ESPO_DEBUG
    DEBUG_OUTPUT.println("Failed to open config file for writing");
 #endif
 
@@ -168,7 +168,7 @@ void ESP_Onboarding::_initToken() {
 
   if (tokenFile) {
 
-#ifdef DEBUG
+#ifdef ESPO_DEBUG
    DEBUG_OUTPUT.println("Token config exists.");
 #endif
 
@@ -194,7 +194,7 @@ void ESP_Onboarding::_initToken() {
     return;
   }
 
-#ifdef DEBUG
+#ifdef ESPO_DEBUG
   DEBUG_OUTPUT.print("saving token: ");
   DEBUG_OUTPUT.println(_token);
 #endif
@@ -212,7 +212,7 @@ void ESP_Onboarding::_wifiReset() {
   // filesystem setup
   if (!SPIFFS.begin()) {
 
-#ifdef DEBUG
+#ifdef ESPO_DEBUG
     DEBUG_OUTPUT.println("Failed to mount file system");
 #endif
 
@@ -221,7 +221,7 @@ void ESP_Onboarding::_wifiReset() {
   // format the flash
   if (!SPIFFS.format()) {
 
-#ifdef DEBUG
+#ifdef ESPO_DEBUG
     DEBUG_OUTPUT.println("Failed to format file system");
 #endif
 
@@ -243,7 +243,7 @@ void ESP_Onboarding::_wifiSetup() {
     _ssid = _server->arg("ssid");
     _pass = _server->arg("pass");
 
-#ifdef DEBUG
+#ifdef ESPO_DEBUG
     DEBUG_OUTPUT.print("configuring ssid: ");
     DEBUG_OUTPUT.println(_ssid);
 #endif
@@ -267,7 +267,7 @@ bool ESP_Onboarding::_authenticate(){
   if(_server->hasHeader(AUTH_HEADER)) {
     String authReq = _server->header(AUTH_HEADER);
 
-#ifdef DEBUG
+#ifdef ESPO_DEBUG
     DEBUG_OUTPUT.print("authReq: ");
     DEBUG_OUTPUT.println(authReq);
 #endif

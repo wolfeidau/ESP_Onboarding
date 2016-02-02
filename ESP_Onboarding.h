@@ -25,7 +25,7 @@ ESP_Onboarding.cpp - Onboarding library for the ESP8266
 
 #include <functional>
 
-//#define DEBUG
+//#define ESPO_DEBUG
 
 class ESP_Onboarding
 {
