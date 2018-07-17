@@ -4,16 +4,16 @@
 # Class
 #######################################
 
-ESP_Onboarding  KEYWORD1
+ESP_Onboarding	KEYWORD1
 
 #######################################
 # Methods and Functions
 #######################################
 
-handleClient    KEYWORD2
-begin           KEYWORD2
-startServer     KEYWORD2
-getSSID         KEYWORD2
-getPassword     KEYWORD2
-getToken        KEYWORD2
-loadWifiCreds   KEYWORD2
+handleClient	KEYWORD2
+begin	KEYWORD2
+startServer	KEYWORD2
+getSSID	KEYWORD2
+getPassword	KEYWORD2
+getToken	KEYWORD2
+loadWifiCreds	KEYWORD2
